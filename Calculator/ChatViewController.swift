@@ -68,8 +68,8 @@ class ChatViewController: MessagesViewController {
     
     var lockOn = false
     
-    var msgLimit = 40
-    let limitCoefficient = 40
+    var msgLimit = 30
+    let limitCoefficient = 30
     
     var infoCard:customInformationCard?
     
@@ -109,6 +109,7 @@ class ChatViewController: MessagesViewController {
         setNotificationSettings(event: .childAdded)
         setNotificationSettings(event: .childChanged)
         
+        trashCan()
         removeAvatar()
         listen()
         
@@ -139,35 +140,40 @@ class ChatViewController: MessagesViewController {
         UIMenuController.shared.menuItems = [saveItem, shareItem]
     }
     
+    func trashCan() {
+        ref.child("users/\(myKey)/threads/\(selectedThread)/messages/0").removeValue()
+        //ref.child("users/\(myKey)/threads/\(selectedThread)/messages").removeValue()
+    }
+    
     @objc func loadMoreMessages() {
         impact(style: .heavy)
             
-            var vishmaArray:[[String:String]] = []
-            msgLimit += limitCoefficient
+        var vishmaArray:[[String:String]] = []
+        msgLimit += limitCoefficient
+        
+        var maxCount = msgLimit
+        
+        ref.child("users/\(myKey)/threads/\(selectedThread)/messages").observe(.value, with: { [self] (snapshot) in
+            maxCount = Int(snapshot.childrenCount)
+            if msgLimit > maxCount {
+                msgLimit = maxCount
+            }
+        })
+        
+        
+        ref.child("users/\(myKey)/threads/\(selectedThread)/messages").queryLimited(toLast: UInt(msgLimit)).observe(.childAdded, with: { [self] (snapshot) in
             
-            var maxCount = msgLimit
-            
-            ref.child("users/\(myKey)/threads/\(selectedThread)/messages").observe(.value, with: { [self] (snapshot) in
-                maxCount = Int(snapshot.childrenCount - 1)
-                if msgLimit > maxCount {
-                    msgLimit = maxCount
-                }
-            })
-            
-            
-            ref.child("users/\(myKey)/threads/\(selectedThread)/messages").queryLimited(toLast: UInt(msgLimit)).observe(.childAdded, with: { [self] (snapshot) in
+            if isView(selfView: self, checkView: ChatViewController.self) {
+                let thing = snapshot.value as? [String:String] ?? ["":""]
+                if thing["id"] != nil {
+                vishmaArray.append(thing)
                 
-                if isView(selfView: self, checkView: ChatViewController.self) {
-                    let thing = snapshot.value as? [String:String] ?? ["":""]
-                    if thing["id"] != nil {
-                    vishmaArray.append(thing)
-                    
-                    if vishmaArray.count == msgLimit {
-                        passOn(a: vishmaArray)
-                    }
-                    }
+                if vishmaArray.count == msgLimit {
+                    passOn(a: vishmaArray)
                 }
-            })
+                }
+            }
+        })
     }
     
     func passOn(a: [[String:String]]) {
@@ -324,8 +330,120 @@ class ChatViewController: MessagesViewController {
         present(actionSheet, animated: true)
     }
     
+    var first = true
     
     func listen() {
+        var lim:UInt?
+        
+        ref.child("users/\(myKey)/threads/\(selectedThread)/messages").observe(.value, with: { [self] (snapshot) in
+            
+            ref.child("users/\(myKey)/threads/\(selectedThread)/messages").queryLimited(toLast: lim ?? UInt(msgLimit)).observeSingleEvent(of: .value, with: { [self] (snapshot) in
+                
+                msgLimit = Int(lim ?? UInt(limitCoefficient))
+                lim = UInt(msgLimit + 1)
+                
+                msgLimit = Int(snapshot.childrenCount)
+                if isView(selfView: self, checkView: ChatViewController.self) {
+                    if let thing = snapshot.value as? NSDictionary {
+                        var keys = thing.allKeys as? [String]
+                        keys!.sort()
+                        if first {
+                            for j in keys! {
+                                let msg = thing[j] as! [String : String]
+                                if msg["type"] == "photo" || msg["type"] == "video" {
+                                    receiveMedia(snap: snapshot)
+                                }
+                                self.load(thing: msg)
+                            }
+                            first = false
+                        } else {
+                            let msg = thing[keys!.last!] as! [String : String]
+                           
+                            if msg["type"] == "photo" || msg["type"] == "video" {
+                                receiveMedia(snap: snapshot)
+                            }
+                            self.load(thing: msg)
+                        }
+                    }
+                }
+            })
+        })
+    }
+    
+    
+    func receiveMedia(snap: DataSnapshot) {
+        if isView(selfView: self, checkView: ChatViewController.self) {
+            if let snapVal = snap.value as? NSDictionary {
+                var keys = snapVal.allKeys as? [String]
+                keys!.sort()
+                for j in keys! {
+                    let thing = snapVal[j] as! [String : String]
+                    
+                    var sender = self.otherUser
+                    
+                    if self.currentUser.senderId == thing["sender"] ?? "" {
+                        sender = self.currentUser
+                    }
+                    
+                    let data = thing["data"] ?? ""
+                    let date = thing["date"] ?? ""
+                    let type = thing["type"] ?? ""
+                    let id = thing["id"] ?? ""
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy-MM-dd' 'HH:mm:ss' 'Z"
+                    let convertedDate = dateFormatter.date(from: date)
+                    
+                    switch type {
+                    case "photo":
+                        guard let imageUrl = URL(string: data),
+                              let placeholder = UIImage(systemName: "plus") else {
+                            return
+                        }
+                
+                        let media = Media(url: imageUrl,
+                                          image: nil,
+                                          placeholderImage: placeholder,
+                                          size: CGSize(width: 300, height: 300))
+                        
+                        for i in self.removalIndex {
+                            let messID = self.messages[i].messageId
+                            if messID == id {
+                                self.messages[i] = Message(sender: sender, messageId: id, sentDate: convertedDate ?? Date(), kind: .photo(media), data: "\(imageUrl)")
+                                self.reload(scroll: true)
+                            }
+                        }
+                        break
+                        
+                    case "video":
+                        guard let imageUrl = URL(string: data),
+                              let placeholder = UIImage(systemName: "plus") else {
+                            return
+                        }
+                        
+                        let media = Media(url: imageUrl,
+                                          image: self.videoPreviewImage(url: imageUrl),
+                                          placeholderImage: placeholder,
+                                          size: CGSize(width: 300, height: 300))
+                        
+                        for i in self.removalIndex {
+                            let messID = self.messages[i].messageId
+                            if messID == id {
+                                self.messages[i] = Message(sender: sender, messageId: id, sentDate: convertedDate ?? Date(), kind: .video(media), data: "\(imageUrl)")
+                                self.reload(scroll: true)
+                            }
+                        }
+                        break
+                    default:
+                        break
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    
+    func listen2() {
         
         ref.child("users/\(myKey)/threads/\(selectedThread)/messages").queryLimited(toLast: UInt(msgLimit)).observe(.childAdded, with: { (snapshot) in
             if isView(selfView: self, checkView: ChatViewController.self) {
@@ -729,7 +847,7 @@ class ChatViewController: MessagesViewController {
             notification.sendPushNotification(to: self.otherUserToken, title: titl, body: body)
             
             self.messagesCollectionView.scrollToLastItem()
-            msgLimit += 1
+            //msgLimit += 1
             
         }
     }
