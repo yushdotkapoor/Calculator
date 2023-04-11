@@ -16,6 +16,7 @@
 		9D03342629CF51B900BF2FB7 /* PassKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03342529CF51B900BF2FB7 /* PassKeyView.swift */; };
 		9D03342829CF56C300BF2FB7 /* SpeechModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D03342729CF56C300BF2FB7 /* SpeechModule.swift */; };
 		9D09320C25C0CCB1008BD4B4 /* PrivacyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D09320B25C0CCB1008BD4B4 /* PrivacyViewController.swift */; };
+		9D0A06BC29E4A07000821008 /* obs.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9D0A06BB29E4A07000821008 /* obs.metal */; };
 		9D1F7F2525CCF31F003C853B /* CheckInternet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1F7F2425CCF31F003C853B /* CheckInternet.swift */; };
 		9D30D96C262401CD000954B7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D30D96B262401CD000954B7 /* GoogleService-Info.plist */; };
 		9D529A1329C45EC200A47931 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D529A1229C45EC200A47931 /* ChatViewController.swift */; };
@@ -89,6 +90,7 @@
 		9D03342529CF51B900BF2FB7 /* PassKeyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassKeyView.swift; sourceTree = "<group>"; };
 		9D03342729CF56C300BF2FB7 /* SpeechModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechModule.swift; sourceTree = "<group>"; };
 		9D09320B25C0CCB1008BD4B4 /* PrivacyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyViewController.swift; sourceTree = "<group>"; };
+		9D0A06BB29E4A07000821008 /* obs.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = obs.metal; sourceTree = "<group>"; };
 		9D1F7F2425CCF31F003C853B /* CheckInternet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInternet.swift; sourceTree = "<group>"; };
 		9D30D96B262401CD000954B7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9D529A1229C45EC200A47931 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 				9D1F7F2425CCF31F003C853B /* CheckInternet.swift */,
 				9D9FFE9B25BBF036003A261C /* StorageManager.swift */,
 				9D993F2126C0F55500C1BE3A /* Extensions.swift */,
+				9D0A06BB29E4A07000821008 /* obs.metal */,
 				9DF9F58829C962B10044C29F /* Credentials.swift */,
 				9D03342729CF56C300BF2FB7 /* SpeechModule.swift */,
 			);
@@ -437,6 +440,7 @@
 				9D03341B29CECEAA00BF2FB7 /* Link.swift in Sources */,
 				9D9FFEF325BC09C0003A261C /* Notifications.swift in Sources */,
 				9D529A1329C45EC200A47931 /* ChatViewController.swift in Sources */,
+				9D0A06BC29E4A07000821008 /* obs.metal in Sources */,
 				9D97EB9E29CA3D73004970A4 /* NotificationStyleTableViewCell.swift in Sources */,
 				9D8DAC1925B747B40085A322 /* SceneDelegate.swift in Sources */,
 				9D529A1B29C7767300A47931 /* MessageView.swift in Sources */,
