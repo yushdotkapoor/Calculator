@@ -369,6 +369,7 @@ class Onboard: UIViewController, AVCapturePhotoCaptureDelegate {
             break
         case .confirmPassword:
             let temp = UserDefaults.standard.string(forKey: "tempPassword")!
+            print("temp \(temp)")
             let pass = 🤣(🌩: temp, 🐔: "123456", 🐚: "987654", 🐉: Date(timeIntervalSince1970: 0), 🐳: "passcode")
             if pass != keepTrack {
                 impact(style: .error)

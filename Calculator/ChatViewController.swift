@@ -85,14 +85,18 @@ class ChatViewController: MessagesViewController {
         .foregroundColor: UIColor.white ])
     
     var messages:[Message] = [] {
-        didSet {
-            if oldValue.count != messages.count {
-                for (i, message) in messages.enumerated() {
-                    if i + 1 == messages.count { break }
-                    if message.sentDate + FIVE_MINUTES < messages[i + 1].sentDate {
+        willSet {
+            if messages.count != newValue.count {
+                for (i, message) in newValue.enumerated() {
+                    if i + 1 == newValue.count { break }
+                    if message.sentDate + FIVE_MINUTES < newValue[i + 1].sentDate && sectionIndices.last! < (i + 1) {
                         sectionIndices.append(i + 1)
                     }
                 }
+            }
+        }
+        didSet {
+            if oldValue.count != messages.count {
                 self.runDownloads()
             }
             messagesCollectionView.reloadDataAndKeepOffset()
@@ -159,14 +163,15 @@ class ChatViewController: MessagesViewController {
         attachmentButton.onTouchUpInside { [weak self] _ in
             self?.presentInputActionSheet()
         }
-        let microphoneButton = InputBarButtonItem()
-        microphoneButton.setSize(CGSize(width: 35, height: 35), animated: false)
-        microphoneButton.setImage(UIImage(systemName: "mic"), for: .normal)
-        microphoneButton.addAction(UIAction(handler: { _ in self.startRecording() }), for: .touchDown)
-        microphoneButton.addAction(UIAction(handler: { _ in self.stopRecording() }), for: .touchUpInside)
+//        let microphoneButton = InputBarButtonItem()
+//        microphoneButton.setSize(CGSize(width: 35, height: 35), animated: false)
+//        microphoneButton.setImage(UIImage(systemName: "mic"), for: .normal)
+//        microphoneButton.addAction(UIAction(handler: { _ in self.startRecording() }), for: .touchDown)
+//        microphoneButton.addAction(UIAction(handler: { _ in self.stopRecording() }), for: .touchUpInside)
         
         messageInputBar.setLeftStackViewWidthConstant(to: 72, animated: false)
-        messageInputBar.setStackViewItems([microphoneButton, attachmentButton], forStack: .left, animated: false)
+//        messageInputBar.setStackViewItems([microphoneButton, attachmentButton], forStack: .left, animated: false)
+        messageInputBar.setStackViewItems([attachmentButton], forStack: .left, animated: false)
         
         DispatchQueue.main.async { [self] in
             UserDefaults.standard.addObserver(self, forKeyPath: threadAggregator.selectedThread, options: [.new], context: nil)
@@ -1065,7 +1070,7 @@ extension ChatViewController: InputBarAccessoryViewDelegate, AttachmentManagerDe
     
     func didSelectDate(_ date: Date) {
         // there is a weird 31 year delta where 1970 = 2001, so I have to subtract 31 years from epoch
-        // It seems like apple's calendar epoch time started in January 1
+        // It seems like apple's calendar epoch time started in January 1, 2001
         let newTime = date.timeIntervalSince1970 - 978307200
         if let url = URL(string: "calshow:\(newTime)") {
             UIApplication.shared.open(url)
@@ -1085,8 +1090,6 @@ extension ChatViewController: InputBarAccessoryViewDelegate, AttachmentManagerDe
             UIApplication.shared.open(url)
         }
     }
-    
-    
     
     func detectorAttributes(for detector: DetectorType, and message: MessageType, at indexPath: IndexPath) -> [NSAttributedString.Key : Any] {
         var attributes = MessageLabel.defaultAttributes as [NSMutableAttributedString.Key : Any]

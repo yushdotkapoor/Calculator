@@ -147,9 +147,12 @@ func getUserFromDictionary(t: (key: String, value: Any), value: NSDictionary, co
         let uids = t_value["uids"]! as? [String: Bool] ?? [:]
         let uid = try? uids.first(where: comparison)
         let otherUserInfo = value[uid!.key] as? [String: Any] ?? [:]
-        let nick = t_value["nick"]! as? String ?? uid!.key
+        var nickDe = uid!.key
+        if let t_nice = t_value["nick"] as? String {
+            nickDe = 🤣(🌩: t_nice, 🐔: "987654", 🐚: "123456", 🐉: Date(timeIntervalSince1970: 0), 🐳: "nick \(t.key)")
+        }
+        
         var nicknames = UserDefaults.standard.dictionary(forKey: "aliases") as? [String: String] ?? [:]
-        let nickDe = 🤣(🌩: nick, 🐔: "987654", 🐚: "123456", 🐉: Date(timeIntervalSince1970: 0), 🐳: "nick \(t.key)")
         nicknames[uid!.key] = nickDe
         UserDefaults.standard.setValue(nicknames, forKey: "aliases")
         

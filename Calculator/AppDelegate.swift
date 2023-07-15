@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         updateCache()
         
         
-        testCredentials()
+//        testCredentials()
         
 //        if let fileUrl = getFileURL(for: "messages.json") {
 //            do {
@@ -46,13 +46,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         t(s: "Hello World!")
         t(s: "Crafty fellow")
         t(s: "He has no idea what is coming for him, and he does not desire anything but food")
-        t(s: "Let's make this as obnoxiously long as possible. i wonder if emojis are supported. They may not be, and that would suck, but I suppose we could wait and see. It's not abnormal to be curious actually. It's more of a human state than an abnormality.")
         t(s: "")
         t(s: "🥲")
         t(s: "this was cool🥲 I wonder if ` all ranged of this \n are supported? ~ I hope so ")
         t(s: "\n")
         t(s: "\0")
         t(s: "gravitatinal levity has\0 no effect on this I hope")
+        t(s: "Let's make this as obnoxiously long as possible. i wonder if emojis are supported. They may not be, and that would suck, but I suppose we could wait and see. It's not abnormal to be curious actually. It's more of a human state than an abnormality.")
         
         
 //        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -72,6 +72,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let id2 = "979454"
         var dt = Date.now
         var sc = UUID().uuidString
+        dt = Date(timeIntervalSince1970: 192304938)
+        sc = "USD8-HFIUS7b-HF8H-HSI89-37HF"
         let en = 😂(🥮: s, 🥛: id1, 🎂: id2, 🍟: dt, 🫐: sc, ez: ez)
         print("\(s) encoded -> \(en)")
         let de = 🤣(🌩: en, 🐔: id1, 🐚: id2, 🐉: dt, 🐳: sc, ez: ez)
