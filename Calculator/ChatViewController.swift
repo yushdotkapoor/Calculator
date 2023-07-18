@@ -169,9 +169,10 @@ class ChatViewController: MessagesViewController {
 //        microphoneButton.addAction(UIAction(handler: { _ in self.startRecording() }), for: .touchDown)
 //        microphoneButton.addAction(UIAction(handler: { _ in self.stopRecording() }), for: .touchUpInside)
         
-        messageInputBar.setLeftStackViewWidthConstant(to: 72, animated: false)
+        let buttonStack = [attachmentButton]
+        messageInputBar.setLeftStackViewWidthConstant(to: CGFloat(36 * buttonStack.count), animated: false)
 //        messageInputBar.setStackViewItems([microphoneButton, attachmentButton], forStack: .left, animated: false)
-        messageInputBar.setStackViewItems([attachmentButton], forStack: .left, animated: false)
+        messageInputBar.setStackViewItems(buttonStack, forStack: .left, animated: false)
         
         DispatchQueue.main.async { [self] in
             UserDefaults.standard.addObserver(self, forKeyPath: threadAggregator.selectedThread, options: [.new], context: nil)
@@ -187,15 +188,14 @@ class ChatViewController: MessagesViewController {
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == threadAggregator.selectedThread {
-            var decodedMessages = threadAggregator.decodeMessageFile()
-            decodedMessages = decodedMessages.filter({ msg in !messages.contains(where: { $0.messageId == msg.key }) })
-            let decodedMsgs = Message.getMessages(fromDictionary: decodedMessages as NSDictionary, threadUsers: threadAggregator.threadUsers)
-            decodedMsgs.forEach({
-                downloadQueue[$0.messageId] = ($0, self.threadAggregator.threadUsers)
-            })
-            messages.append(contentsOf: decodedMsgs)
-            
-            handleHaptics()
+                var decodedMessages = threadAggregator.decodeMessageFile()
+                decodedMessages = decodedMessages.filter({ msg in !messages.contains(where: { $0.messageId == msg.key }) })
+                let decodedMsgs = Message.getMessages(fromDictionary: decodedMessages as NSDictionary, threadUsers: threadAggregator.threadUsers)
+                decodedMsgs.forEach({
+                    downloadQueue[$0.messageId] = ($0, self.threadAggregator.threadUsers)
+                })
+                messages.append(contentsOf: decodedMsgs)
+                handleHaptics()
         } else if keyPath == "\(threadAggregator.selectedThread!)_delete" {
             let decodedMessages = threadAggregator.decodeMessageFile()
             if let delArr = UserDefaults.standard.array(forKey: "\(threadAggregator.selectedThread!)_delete") as? [String] {

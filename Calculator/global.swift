@@ -100,27 +100,31 @@ func updateFaceIdEntry() {
 func updateCache() {
     threadAggregators = []
     ref.child("Users").observe(.value, with: { (snapshot) in
-        guard let value = snapshot.value as? NSDictionary else { return }
-        allKeys = value.allKeys as? [String] ?? []
-        let jValue = JSON(value)
-        guard let myInfo = jValue.first(where: { $0.0 == myKey }), let dict = myInfo.1.dictionary, let threads = dict["threads"]?.dictionaryObject else { return }
-        
-        var relevantUsers: [User] = []
-        if !threads.isEmpty {
-            relevantUsers.append(getUserFromDictionary(t: threads.first!, value: value, comparison: { $0.key == myKey }))
+        DispatchQueue.global(qos: .background).sync {
+            guard let value = snapshot.value as? NSDictionary else { return }
+            allKeys = value.allKeys as? [String] ?? []
+            let jValue = JSON(value)
+            guard let myInfo = jValue.first(where: { $0.0 == myKey }), let dict = myInfo.1.dictionary, let threads = dict["threads"]?.dictionaryObject else { return }
+            
+            var relevantUsers: [User] = []
+            if !threads.isEmpty {
+                relevantUsers.append(getUserFromDictionary(t: threads.first!, value: value, comparison: { $0.key == myKey }))
+            }
+            
+            for t in threads {
+                relevantUsers.append(getUserFromDictionary(t: t, value: value, comparison: { $0.key != myKey }))
+            }
+            
+            UserDefaults.standard.setValue(try! PropertyListEncoder().encode(relevantUsers), forKey: "relevantUsers")
+            UserDefaults.standard.setValue(threads, forKey: "threads")
+            
+            let unread = JSON(threads).filter({ $0.1.dictionaryValue["uids"]!.dictionaryValue.contains(where: { $0.key == myKey && $0.value.boolValue }) })
+            DispatchQueue.main.async {
+                UIApplication.shared.applicationIconBadgeNumber = unread.isEmpty ? 0 : 1
+            }
+            
+            updateThreadsIfNeeded(threads: threads)
         }
-        
-        for t in threads {
-            relevantUsers.append(getUserFromDictionary(t: t, value: value, comparison: { $0.key != myKey }))
-        }
-        
-        UserDefaults.standard.setValue(try! PropertyListEncoder().encode(relevantUsers), forKey: "relevantUsers")
-        UserDefaults.standard.setValue(threads, forKey: "threads")
-        
-        let unread = JSON(threads).filter({ $0.1.dictionaryValue["uids"]!.dictionaryValue.contains(where: { $0.key == myKey && $0.value.boolValue }) })
-        UIApplication.shared.applicationIconBadgeNumber = unread.isEmpty ? 0 : 1
-        
-        updateThreadsIfNeeded(threads: threads)
     })
 }
 
@@ -284,7 +288,7 @@ func getTopViewController() -> UIViewController? {
 }
 
 func openSettings() {
-    if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+    if let settingsUrl = URL(string: UIApplication.openSettingsURLString + "/Calculator") {
         // Check if the app is authorized for push notifications
         if let appSettings = URL(string: UIApplication.openSettingsURLString + Bundle.main.bundleIdentifier!) {
             if UIApplication.shared.canOpenURL(appSettings) {

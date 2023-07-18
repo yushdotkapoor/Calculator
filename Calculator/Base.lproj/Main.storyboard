@@ -64,7 +64,7 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xHB-Sn-J4P" customClass="RoundButton" customModule="Calculator" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="60" width="374" height="30"/>
                                         <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <state key="normal" title="Welcome Page"/>
+                                        <state key="normal" title="Welcome &amp; Permissions Page"/>
                                         <connections>
                                             <action selector="goToWelcomePage:" destination="n6k-N1-Doc" eventType="touchUpInside" id="aiP-Na-0y6"/>
                                         </connections>
@@ -799,11 +799,11 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <stackView opaque="NO" contentMode="scaleToFill" alignment="top" spacing="248" translatesAutoresizingMaskIntoConstraints="NO" id="XaL-3S-YUh">
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="XaL-3S-YUh">
                                 <rect key="frame" x="20" y="782" width="374" height="33"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zpQ-ct-rsM">
-                                        <rect key="frame" x="0.0" y="0.0" width="70" height="33"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="59" height="33"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <state key="normal" title="&lt;&lt;Back"/>
                                         <connections>
